@@ -1,0 +1,129 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frutería - Gestión de Productos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .form-container {
+            margin-top: 20px;
+        }
+
+        .product-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+            .product-table th, .product-table td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: center;
+            }
+
+            .product-table th {
+                background-color: #f4f4f4;
+            }
+
+        button {
+            margin-left: 10px;
+            color: white;
+            background-color: red;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Frutería - Gestión de Productos</h1>
+
+    <div class="form-container">
+        <h2>Agregar Producto</h2>
+        <label for="nombre">Nombre del producto:</label>
+        <input type="text" id="nombre" required>
+        <br><br>
+        <label for="precio_kg">Precio por kilogramo:</label>
+        <input type="number" id="precio_kg" step="0.01" placeholder="0 si no aplica">
+        <br><br>
+        <label for="precio_pieza">Precio por pieza:</label>
+        <input type="number" id="precio_pieza" step="0.01" placeholder="0 si no aplica">
+        <br><br>
+        <button onclick="agregarProducto()">Agregar Producto</button>
+    </div>
+
+    <h2>Lista de Productos</h2>
+    <table class="product-table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Precio por Kilogramo</th>
+                <th>Precio por Pieza</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="productos">
+            <!-- Productos serán añadidos aquí -->
+        </tbody>
+    </table>
+
+    <script>
+        // Inicializar lista de productos desde localStorage
+        let productos = JSON.parse(localStorage.getItem('productos')) || [];
+
+        function mostrarProductos() {
+            const productosTbody = document.getElementById('productos');
+            productosTbody.innerHTML = '';
+
+            productos.forEach((producto, index) => {
+                const productoRow = document.createElement('tr');
+                productoRow.innerHTML = `
+                        <td>${producto.nombre}</td>
+                        <td>${producto.precio_kg > 0 ? '$' + producto.precio_kg + ' / kg' : 'N/A'}</td>
+                        <td>${producto.precio_pieza > 0 ? '$' + producto.precio_pieza + ' / pieza' : 'N/A'}</td>
+                        <td><button onclick="eliminarProducto(${index})">Eliminar</button></td>
+                    `;
+                productosTbody.appendChild(productoRow);
+            });
+        }
+
+        function agregarProducto() {
+            const nombre = document.getElementById('nombre').value;
+            const precio_kg = parseFloat(document.getElementById('precio_kg').value) || 0;
+            const precio_pieza = parseFloat(document.getElementById('precio_pieza').value) || 0;
+
+            if (nombre && (precio_kg > 0 || precio_pieza > 0)) {
+                productos.push({ nombre, precio_kg, precio_pieza });
+                localStorage.setItem('productos', JSON.stringify(productos));
+                mostrarProductos();
+
+                document.getElementById('nombre').value = '';
+                document.getElementById('precio_kg').value = '';
+                document.getElementById('precio_pieza').value = '';
+            } else {
+                alert('Por favor, ingresa un nombre y al menos un precio válido.');
+            }
+        }
+
+        function eliminarProducto(index) {
+            productos.splice(index, 1);
+            localStorage.setItem('productos', JSON.stringify(productos));
+            mostrarProductos();
+        }
+
+        // Mostrar productos al cargar la página
+        mostrarProductos();
+    </script>
+</body>
+</html>
+
